@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
+using System.Linq;
+using System.Runtime.Loader;
 
 namespace WebApp1
 {
@@ -20,7 +23,11 @@ namespace WebApp1
         public void ConfigureServices(IServiceCollection services)
         {
             // Load Assembly containing external controllers
-            var assembly = typeof(ControllersExt.Hello1Controller).Assembly;
+            var parts = AppDomain.CurrentDomain.BaseDirectory.Split("\\");
+            var path = string.Join('\\', parts.Take(parts.Length - 5)) + 
+                @"\Controllers\bin\Debug\netcoreapp3.1\Controllers.dll";
+
+            var assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(path);
             services.AddControllers()
                 .PartManager.ApplicationParts.Add(new AssemblyPart(assembly));
         }
